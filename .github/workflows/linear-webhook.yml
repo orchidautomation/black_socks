@@ -1,0 +1,67 @@
+name: Linear Webhook Handler
+
+on:
+  repository_dispatch:
+    types: [linear-webhook]
+
+jobs:
+  process-linear-event:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install TaskMaster
+        run: |
+          npm install -g task-master-ai@latest
+          
+      - name: Initialize TaskMaster
+        if: ${{ !contains(github.event.repository.topics, 'taskmaster-initialized') }}
+        run: |
+          task-master init --yes --rules claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Process Linear Event
+        run: |
+          echo "Processing Linear event: ${{ github.event.client_payload.action }}"
+          echo "Issue ID: ${{ github.event.client_payload.data.id }}"
+          echo "Issue Title: ${{ github.event.client_payload.data.title }}"
+          
+      - name: Execute Claude Code Action
+        if: ${{ github.event.client_payload.action == 'issue.create' || github.event.client_payload.action == 'issue.update' }}
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Linear Issue: ${{ github.event.client_payload.data.identifier }}
+            Title: ${{ github.event.client_payload.data.title }}
+            Description: ${{ github.event.client_payload.data.description }}
+            
+            Tasks:
+            1. Parse this Linear issue
+            2. Generate PRD using TaskMaster
+            3. Create subtasks in Linear
+            4. Begin implementing each subtask
+            5. Create atomic commits for each
+            6. Update Linear status in real-time
+            
+            Use the Linear API to update the issue and create subtasks.
+          claude_args: "--max-turns 25"
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
