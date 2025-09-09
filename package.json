@@ -1,19 +1,36 @@
 {
-  "name": "claude-code-template",
+  "name": "black-socks-landing",
   "version": "1.0.0",
-  "description": "Template for Claude Code GitHub automation",
+  "description": "Black Socks Landing Page - Next.js",
   "scripts": {
-    "test": "echo \"No tests yet\""
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.0.4",
+    "typescript": "^5.3.3"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/orchidautomation/claude-code-template.git"
+    "url": "https://github.com/orchidautomation/black_socks.git"
   },
   "keywords": [
-    "claude",
-    "automation",
-    "github-actions"
+    "nextjs",
+    "landing-page",
+    "black-socks",
+    "ecommerce"
   ],
-  "author": "",
+  "author": "orchidautomation",
   "license": "MIT"
 }
